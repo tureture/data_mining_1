@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 import csv
 
 # TASK 1
@@ -65,4 +68,52 @@ print("Average sepal length after outliers removed: ", data["sl"].mean())
 print("Std sepal length after outliers removed: ", data["sl"].std())
 
 
+
+# TASK 3
+
+# 3.1
+# Normalize data with MinMax 
+#data.drop(['species'], axis=1, inplace=True)
+# scaled = MinMaxScaler().fit_transform(data[["sl", "sw", "pl", "pw"]])
+data_minmax = data.copy()
+for col in data_minmax.columns:
+    if col != 'species':
+        data_minmax[col] = (data[col] - data[col].min()) / (data[col].max() - data[col].min())
+
+print()
+print("Mean of sl after MinMax: ", data_minmax["sl"].mean())
+print("Std of sl after MinMax: ", data_minmax["sl"].std())
+
+# 3.2
+# Normalize data with mean and std
+data_meanstd = data.copy()
+for col in data_meanstd.columns:
+    if col != 'species':
+        data_meanstd[col] = (data[col] - data[col].mean()) / data[col].std()
+
+print()
+print("Mean of sl after mean and std: ", data_meanstd["sl"].mean())
+print("Std of sl after mean and std: ", data_meanstd["sl"].std())
+
+# 3.3 & 3.4
+# Apply PCA
+pca = PCA(n_components=0.95)
+principalComponents = pca.fit(data_meanstd[["pl", "pw", "sl", "sw"]])
+print("Nr components: ", principalComponents.n_components_)
+print("Explained variance: ", sum(principalComponents.explained_variance_ratio_))
+print("Values of components: ", principalComponents.components_)
+
+# 3.5
+data_meanstd_rescaled = data_meanstd.copy()
+
+# rescale column in pl to range 0 - 100
+data_meanstd_rescaled['pl'] = (data_meanstd_rescaled['pl'] - data_meanstd_rescaled['pl'].min()) / (data_meanstd_rescaled['pl'].max() - data_meanstd_rescaled['pl'].min())* 100
+
+# Apply PCA
+pca = PCA(n_components=0.95)
+principalComponents = pca.fit(data_meanstd_rescaled[["pl", "pw", "sl", "sw"]])
+print()
+print("Rescaled Nr components: ", principalComponents.n_components_)
+print("Rescaled Explained variance: ", sum(principalComponents.explained_variance_ratio_))
+print("Rescaled Values of components: ", principalComponents.components_)
 
