@@ -117,3 +117,33 @@ print("Rescaled Nr components: ", principalComponents.n_components_)
 print("Rescaled Explained variance: ", sum(principalComponents.explained_variance_ratio_))
 print("Rescaled Values of components: ", principalComponents.components_)
 
+
+
+
+# TASK 4
+
+# 4.1
+# Sample 150 instances
+sampled_data = data.sample(n=150, random_state=1)
+
+# 4.2 
+# Sample with bootstrap
+sampled_data_boot = data.sample(n=150, replace=True, random_state=1)
+
+# 4.3
+# Stratified sampling
+sampled_data_stratified = data.groupby('species', group_keys=False).apply(lambda x: x.sample(frac=0.5))
+
+# 4.4
+# Stratified sampling with 50 samples each
+sampled_data_stratified_2 = data.groupby('species', group_keys=False).apply(lambda x: x.sample(50))
+
+# Print nr of each type
+print()
+print("Nr of each type in sampled data: ", sampled_data.groupby('species').count())
+print()
+print("Nr of each type in sampled data with bootstrap: ", sampled_data_boot.groupby('species').count())
+print()
+print("Nr of each type in sampled data with stratified sampling: ", sampled_data_stratified.groupby('species').count())
+print()
+print("Nr of each type in sampled data with stratified sampling 50 each: ", sampled_data_stratified_2.groupby('species').count())
