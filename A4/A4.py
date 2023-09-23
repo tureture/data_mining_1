@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import LeaveOneOut
 from sklearn import preprocessing
+from sklearn.feature_selection import SequentialFeatureSelector
 
 # Task 0 
 # Load csv data
@@ -65,5 +66,25 @@ loo = LeaveOneOut()
 scores = cross_val_score(model, X_scaled, y, cv=loo)
 print("Leave one out cross validation (after scaling): ", scores.mean(), " +/- ", scores.std())
 
+# Task 3
 
+# k-NN classifier
+n_neighbors = 1
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
 
+# Sequential feature selection
+selector=SequentialFeatureSelector(model, n_features_to_select=10 ,direction="forward")
+selector = selector.fit(X, y)
+selector.get_support()
+
+# Drop other columns
+X = selector.transform(X)
+
+# Check performance
+loo = LeaveOneOut()
+scores = cross_val_score(model, X, y, cv=loo)
+print("Leave one out cross validation (after feature selection): ", scores.mean(), " +/- ", scores.std())
+
+# List of selected features
+data = cancer_data.iloc[:, 2:]
+print("Selected features: ", data.columns[selector.get_support()])
