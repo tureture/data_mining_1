@@ -11,6 +11,7 @@ from sklearn import preprocessing
 from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
+from sklearn import tree
 
 # Task 0 
 # Load csv data
@@ -163,3 +164,14 @@ classifier.fit(X.values,y)
 best_idx = np.argmax(classifier.cv_results_['mean_test_score'])
 classifier.cv_results_['params'][best_idx]
 print("Best k: ", classifier.cv_results_['params'][best_idx]['n_neighbors'])
+
+# Task 7
+X = cancer_data.iloc[:, 2:]
+
+# Decision tree classifier
+decision_tree = tree.DecisionTreeClassifier(min_samples_leaf=20)
+decision_tree.fit(X, y)
+
+# Number of nodes in tree
+print("Number of nodes in tree: ", decision_tree.tree_.node_count)
+
