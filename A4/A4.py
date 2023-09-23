@@ -10,6 +10,7 @@ from sklearn.model_selection import LeaveOneOut
 from sklearn import preprocessing
 from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.decomposition import PCA
+from sklearn.model_selection import GridSearchCV
 
 # Task 0 
 # Load csv data
@@ -141,3 +142,24 @@ for i in [1, 5, 10, 15, 20]:
     loo = LeaveOneOut()
     scores = cross_val_score(model, X, y, cv=loo)
     print("Leave one out cross validation (PCA with ", i, " components): ", scores.mean(), " +/- ", scores.std())
+
+# Task 6
+# Optimize k with grid search
+# k-NN classifier
+model = KNeighborsClassifier()
+
+# Scale data
+X = cancer_data.iloc[:, 2:]
+scaler = preprocessing.MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Grid search
+parameters = {'n_neighbors': [i for i in range(1,20)]}
+knn_model = KNeighborsClassifier()
+classifier = GridSearchCV(knn_model, parameters)
+classifier.fit(X.values,y)
+
+# Take best value
+best_idx = np.argmax(classifier.cv_results_['mean_test_score'])
+classifier.cv_results_['params'][best_idx]
+print("Best k: ", classifier.cv_results_['params'][best_idx]['n_neighbors'])
