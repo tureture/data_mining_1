@@ -21,4 +21,34 @@ print("Number of B: ", np.count_nonzero(cancer_data.diagnosis == "B"))
 print("Number of M: ", np.count_nonzero(cancer_data.diagnosis == "M"))
 
 
+# Task 1
+X, y = cancer_data.iloc[:, 2:], cancer_data.iloc[:, 1]
+
+
+# k-NN classifier
+n_neighbors = 1
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+
+# Holdout 70/30
+X_trainset, X_testset, y_trainset, y_testset = train_test_split(X,y, test_size=0.3, random_state=0)
+model.fit(X_trainset, y_trainset)
+model.score(X=X_testset,y=y_testset)
+print("Holdout 70/30: ", model.score(X=X_testset,y=y_testset))
+
+
+# 10 fold cross validation
+scores = cross_val_score(model, X, y, cv=10)
+print("10 fold cross validation: ", scores.mean(), " +/- ", scores.std())
+
+# Leave one out
+loo = LeaveOneOut()
+scores = cross_val_score(model, X, y, cv=loo)
+print("Leave one out: ", scores.mean(), " +/- ", scores.std())
+
+# 10 fold cross validation with k=10
+n_neighbors = 10
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+scores = cross_val_score(model, X, y, cv=10)
+print("10 fold cross validation with k=10: ", scores.mean(), " +/- ", scores.std())
+
 
