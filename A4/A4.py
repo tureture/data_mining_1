@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import LeaveOneOut
+from sklearn import preprocessing
 
 # Task 0 
 # Load csv data
@@ -50,5 +51,19 @@ n_neighbors = 10
 model = KNeighborsClassifier(n_neighbors, metric="euclidean")
 scores = cross_val_score(model, X, y, cv=10)
 print("10 fold cross validation with k=10: ", scores.mean(), " +/- ", scores.std())
+
+# Task 2
+n_neighbors = 1
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+
+# Scale data
+scaler = preprocessing.MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Leave one out cross validation
+loo = LeaveOneOut()
+scores = cross_val_score(model, X_scaled, y, cv=loo)
+print("Leave one out cross validation (after scaling): ", scores.mean(), " +/- ", scores.std())
+
 
 
