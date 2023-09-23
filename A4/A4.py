@@ -88,3 +88,31 @@ print("Leave one out cross validation (after feature selection): ", scores.mean(
 # List of selected features
 data = cancer_data.iloc[:, 2:]
 print("Selected features: ", data.columns[selector.get_support()])
+
+# Task 4
+# k-NN classifier
+n_neighbors = 1
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+
+# Scale data
+X = cancer_data.iloc[:, 2:]
+scaler = preprocessing.MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Sequential feature selection
+selector=SequentialFeatureSelector(model, n_features_to_select=10 ,direction="forward")
+selector = selector.fit(X_scaled, y)
+
+# Drop other columns
+X = selector.transform(X_scaled)
+
+# Stats of X
+print("Shape of X: ", X.shape)
+print("Mean of X: ", X.mean())
+print("Std of X: ", X.std())
+
+# Check performance
+loo = LeaveOneOut()
+scores = cross_val_score(model, X, y, cv=loo)
+print("Leave one out cross validation (combined normalization + feature selection): ", scores.mean(), " +/- ", scores.std())
+
