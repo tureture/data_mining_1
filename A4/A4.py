@@ -9,6 +9,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import LeaveOneOut
 from sklearn import preprocessing
 from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.decomposition import PCA
 
 # Task 0 
 # Load csv data
@@ -116,3 +117,27 @@ loo = LeaveOneOut()
 scores = cross_val_score(model, X, y, cv=loo)
 print("Leave one out cross validation (combined normalization + feature selection): ", scores.mean(), " +/- ", scores.std())
 
+# Task 5
+# Principal component analysis
+
+# k-NN classifier
+n_neighbors = 1
+model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+
+# Scale data
+X = cancer_data.iloc[:, 2:]
+scaler = preprocessing.MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Reduce dimensionality
+pca = PCA(n_components=2)
+X = pca.fit_transform(X_scaled)
+print("PCA Explained variance: ", sum(pca.explained_variance_ratio_))
+
+# Accuracy when varying the number of components
+for i in [1, 5, 10, 15, 20]:
+    pca = PCA(n_components=i)
+    X = pca.fit_transform(X_scaled)
+    loo = LeaveOneOut()
+    scores = cross_val_score(model, X, y, cv=loo)
+    print("Leave one out cross validation (PCA with ", i, " components): ", scores.mean(), " +/- ", scores.std())
