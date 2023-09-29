@@ -46,13 +46,38 @@ print("kNN with k=1, 10 fold cross validation: ", scores.mean(), " +/- ", scores
 # X = vectorizer.fit_transform(X)
 
 # Remove unfrequent words
-vectorizer = CountVectorizer()
+vectorizer = CountVectorizer(analyzer="char_wb", ngram_range=(2, 2), min_df=0.01, max_df=0.99)
 X = vectorizer.fit_transform(X_original)
 
 
 
 # Evaluate kNN
 n_neighbors = 1
-model = KNeighborsClassifier(n_neighbors, metric="euclidean")
+model = KNeighborsClassifier(n_neighbors, metric="euclidean", weights="uniform")
 scores = cross_val_score(model, X, y, cv=10)
 print("kNN with k=1, 10 fold cross validation, stop words removed: ", scores.mean(), " +/- ", scores.std())
+
+# Loop over different parameters of count vectorizer
+ngram_range_values = [(1, 1), (1, 2), (2, 2)]
+min_df_values = [0.01, 0.05, 0.1]
+max_df_values = [0.9, 0.95, 0.99]
+
+max_score = 0
+
+for ngram_range in ngram_range_values:
+    for min_df in min_df_values:
+        for max_df in max_df_values:
+            vectorizer = CountVectorizer(analyzer="char_wb", ngram_range=ngram_range, min_df=min_df, max_df=max_df)
+            X = vectorizer.fit_transform(X_original)
+            model = KNeighborsClassifier(n_neighbors, metric="euclidean", weights="uniform")
+            scores = cross_val_score(model, X, y, cv=10)
+            print("Results, ngram_range=", ngram_range, ", min_df=", min_df, ", max_df=", max_df, ": ", scores.mean(), " +/- ", scores.std())
+            if scores.mean() > max_score:
+                max_score = scores.mean()
+                max_ngram_range = ngram_range
+                max_min_df = min_df
+                max_max_df = max_df
+
+print("Best results, ngram_range=", max_ngram_range, ", min_df=", max_min_df, ", max_df=", max_max_df, ": ", max_score)
+
+
